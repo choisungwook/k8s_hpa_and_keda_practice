@@ -286,6 +286,73 @@ NAME                          REFERENCE                       TARGETS   MINPODS 
 keda-hpa-nginx-keda-example   Deployment/nginx-keda-example   2/50      1         5         1          41s
 ```
 
+## 6.7 keda trigger 로그
+
+* keda value보다 높을 때 trigger 확인
+
+```bash
+$ kubectl -n default describe hpa
+Events:
+  Type    Reason             Age   From                       Message
+  ----    ------             ----  ----                       -------
+  Normal  SuccessfulRescale  3s    horizontal-pod-autoscaler  New size: 2; reason: external metric s0-prometheus(&LabelSelector{MatchLabels:map[string]string{scaledobject.keda.sh/name: nginx-keda-example,},MatchExpressions:[]LabelSelectorRequirement{},}) above target
+```
+
+## 6.8 keda 메트릭 직접 조회
+* external metrics API 직접 조회
+
+```bash
+$ kubectl get --raw "/apis/external.metrics.k8s.io/v1beta1" | jq .
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "external.metrics.k8s.io/v1beta1",
+  "resources": [
+    {
+      "name": "externalmetrics",
+      "singularName": "",
+      "namespaced": true,
+      "kind": "ExternalMetricValueList",
+      "verbs": [
+        "get"
+      ]
+    }
+  ]
+}
+```
+
+* scaledobject에서 external metrics 이름 확인: s0-prometheus이름 확인
+
+```bash
+$ kubectl -n default get scaledobject nginx-keda-example  -o jsonpath={.status.externalMetricNames};echo
+["s0-prometheus"]
+```
+
+* keda metric server pod 로그 확인: metrics server가 s0-prometheus external metric을 조회하는 것을 확인
+
+```bash
+$ kubectl -n keda logs -f -l app=keda-operator-metrics-apiserver
+I1009 22:21:02.300519       1 httplog.go:132] "HTTP" verb="LIST" URI="/apis/external.metrics.k8s.io/v1beta1/namespaces/default/s0-prometheus?labelSelector=scaledobject.keda.sh%2Fname%3Dnginx-keda-example" latency="18.242833ms" userAgent="kube-controller-manager/v1.28.0 (linux/arm64) kubernetes/855e7c4/system:serviceaccount:kube-system:horizontal-pod-autoscaler" audit-ID="54353430-8b05-4420-9bce-24f9212562ab" srcIP="172.18.0.3:35479" resp=200
+```
+
+* External API 직접 조회: s0-prometheus external metrics을 대상으로 조회
+```bash
+$ kubectl get --raw "/apis/external.metrics.k8s.io/v1beta1/namespaces/default/s0-prometheus?labelSelector=scaledobject.keda.sh%2Fname%3Dnginx-keda-example" | jq .
+{
+  "kind": "ExternalMetricValueList",
+  "apiVersion": "external.metrics.k8s.io/v1beta1",
+  "metadata": {},
+  "items": [
+    {
+      "metricName": "s0-prometheus",
+      "metricLabels": null,
+      "timestamp": "2023-10-09T22:22:16Z",
+      "value": "122"
+    }
+  ]
+}
+```
+
 # 참고자료
 * [github] prometheus adapter: https://github.com/kubernetes-sigs/prometheus-adapter/blob/master/docs/walkthrough.md
 * [blog] custom and external metrics: https://medium.com/uptime-99/kubernetes-hpa-autoscaling-with-custom-and-external-metrics-da7f41ff7846
@@ -294,3 +361,4 @@ keda-hpa-nginx-keda-example   Deployment/nginx-keda-example   2/50      1       
 * [blog] custom nginx prometheus adatper request_per_second configruation: https://medium.com/ibm-cloud/autoscaling-applications-on-openshift-container-platform-3-11-with-custom-metrics-6e9c14474de3
 * [blog] custom postgres prometheus adatper request_per_second configruation https://www.postgresql.fastware.com/knowledge-base/how-to/installing-the-prometheus-adapter
 * [blog] custom metrics HPA configuration: https://vsoch.github.io/2023/autoscaling-v2/
+* [offical document] keda metrics server: https://keda.sh/docs/2.9/operate/metrics-server/
