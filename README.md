@@ -271,19 +271,19 @@ keda-hpa-nginx-keda-example   Deployment/nginx-keda-example   0/50 (avg)   1    
 ```
 
 ## 6.6 keda 리소스 디버깅
-* keda operator pod 로그 조회: "value: 250"
+* keda operator pod 로그 조회: "value: 2"인 것을 확인
 
 ```bash
 kubectl -n keda logs -f -l app=keda-operator
-2023-10-09T15:57:02Z	DEBUG	scale_handler	Getting metrics from scaler	{"scaledObject.Namespace": "default", "scaledObject.Name": "nginx-keda-example", "scaler": "prometheusScaler", "metricName": "s0-prometheus", "metrics": [{"metricName":"s0-prometheus","metricLabels":null,"timestamp":"2023-10-09T15:57:02Z","value":"250"}], "scalerError": null}
+2023-10-09T22:12:46Z	DEBUG	scale_handler	Getting metrics from scaler	{"scaledObject.Namespace": "default", "scaledObject.Name": "nginx-keda-example", "scaler": "prometheusScaler", "metricName": "s0-prometheus", "metrics": [{"metricName":"s0-prometheus","metricLabels":null,"timestamp":"2023-10-09T22:12:46Z","value":"2"}], "scalerError": null}
 ```
 
-* hpa avg 확인
+* hpa avg 확인: "Targets: 2/50"인 것을 확인
 
 ```bash
 kubectl -n default get hpa
-NAME                          REFERENCE                       TARGETS           MINPODS   MAXPODS   REPLICAS   AGE
-keda-hpa-nginx-keda-example   Deployment/nginx-keda-example   60200m/50 (avg)   1         5         5          29m
+NAME                          REFERENCE                       TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+keda-hpa-nginx-keda-example   Deployment/nginx-keda-example   2/50      1         5         1          41s
 ```
 
 # 참고자료
