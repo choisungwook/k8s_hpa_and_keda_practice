@@ -26,3 +26,9 @@ install-prometheus-adapter:
 	@helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	@helm repo update
 	@helm upgrade --install -n ${HELM_NAMESPACE} -f helm_values/prometheus-adatper.yaml prometheus-adapter prometheus-community/prometheus-adapter
+
+install-keda:
+	@echo "[info] install latest prometheus-adapter"
+	@helm repo add kedacore https://kedacore.github.io/charts
+	@helm repo update
+	@helm install -n ${HELM_NAMESPACE} keda kedacore/keda
