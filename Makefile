@@ -1,6 +1,6 @@
 HELM_NAMESPACE = default
 
-install: install-kind install-metrics-server install-prometheus-operator install-prometheus-adapter
+install: install-kind install-metrics-server
 
 uninstall:
 	@echo "[info] delete kind cluster"
