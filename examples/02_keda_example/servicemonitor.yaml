@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nginx-keda-example
+  namespace: default
+  labels:
+    app: nginx-keda-example
+    release: operator
+spec:
+  endpoints:
+  - port: exporter
+  selector:
+    matchLabels:
+      app: nginx-keda-example

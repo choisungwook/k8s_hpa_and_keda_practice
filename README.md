@@ -98,7 +98,7 @@ $ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1" | jq . | more
 
 <br>
 
-# 5. custom 메트릭 추가
+# 5. custom 메트릭과 HPA 예제
 ## 5.1 nginx pod, service, servicemonitor, hpa 배포
 * 예제 디렉터리에 있는 manifest 배포
 
@@ -218,6 +218,63 @@ Events:
   Type    Reason             Age   From                       Message
   ----    ------             ----  ----                       -------
   Normal  SuccessfulRescale  57s   horizontal-pod-autoscaler  New size: 3; reason: pods metric nginx_http_requests_total above target
+```
+
+<br>
+
+# 6. KEDA
+
+## 6.1 전제조건
+* prometheus operator가 설치되어 있어야 함
+
+```bash
+# prometheus operator 설치
+make install-prometheus-operator
+```
+
+## 6.2 KEDA 배포
+
+```bash
+$ make install-keda
+$ kubectl -n keda get po
+NAME                                               READY   STATUS    RESTARTS        AGE
+keda-admission-webhooks-5458b867ff-qrrl4           1/1     Running   0               2m59s
+keda-operator-785546b5d7-ps2lw                     1/1     Running   1 (2m49s ago)   2m59s
+keda-operator-metrics-apiserver-6f68c4d7dc-lqg9r   1/1     Running   0               2m59s
+```
+
+## 6.3 예제 배포
+
+```bash
+kubectl apply -f ./examples/02_keda_example
+```
+
+## 6.4 prometheus에서 metric 수집되는지 확인
+* prometheus nodeport: http://127.0.0.1:30950
+* 확인해야하는 메트릭: nginx_http_requests_total
+
+## 6.5 keda 리소스 조회
+* crd ScaledObject조회
+
+```bash
+$ kubectl -n default get ScaledObject nginx-keda-example
+NAME                 SCALETARGETKIND      SCALETARGETNAME      MIN   MAX   TRIGGERS     AUTHENTICATION   READY   ACTIVE   FALLBACK   PAUSED    AGE
+nginx-keda-example   apps/v1.Deployment   nginx-keda-example   1     5     prometheus                    True    False    False      Unknown   2m41s
+```
+
+* ScaleObject는 HPA를 생성하고 관리
+
+```bash
+kubectl -n default get hpa
+NAME                          REFERENCE                       TARGETS      MINPODS   MAXPODS   REPLICAS   AGE
+keda-hpa-nginx-keda-example   Deployment/nginx-keda-example   0/50 (avg)   1         5         1          4m27s
+```
+
+## 6.6 keda 리소스 디버깅
+* keda operator pod 로그 조회
+
+```bash
+kubectl -n keda logs -f -l app=keda-operator
 ```
 
 # 참고자료
