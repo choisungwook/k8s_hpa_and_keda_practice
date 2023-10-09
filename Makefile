@@ -19,7 +19,7 @@ install-prometheus-operator:
 	@echo "[info] install latest prometheus-operator"
 	@helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	@helm repo update
-	@helm upgrade --install -n ${HELM_NAMESPACE} operator prometheus-community/kube-prometheus-stack
+	@helm upgrade --install -n ${HELM_NAMESPACE} -f helm_values/prometheus-operator.yaml operator prometheus-community/kube-prometheus-stack
 
 install-prometheus-adapter:
 	@echo "[info] install latest prometheus-adapter"

@@ -4,5 +4,8 @@ name: hpa-practice
 nodes:
 - role: control-plane
   image: kindest/node:v1.28.0
+  extraPortMappings:
+  - containerPort: 30950
+    hostPort: 30950
 - role: worker
   image: kindest/node:v1.28.0
