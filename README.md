@@ -132,7 +132,7 @@ install-prometheus-adapter
 ```
 
 ## 5.5 커스텀 메트릭 등록 확인
-* 커스컴 메트릭 목록 확인
+* 커스컴 메트릭 목록에 nginx_http_requests_total가 있는지 확인
 
 ```bash
 $ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1" | jq .
@@ -185,7 +185,7 @@ $ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1" | jq .
 * nginx_http_requests_total 커스텀 메트릭이 추가되었는지 확인
 
 ```bash
-kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*/nginx_http_requests_total" | jq .
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/service/nginx-custom-metric/nginx_http_requests_total" | jq .
 {
   "kind": "MetricValueList",
   "apiVersion": "custom.metrics.k8s.io/v1beta1",

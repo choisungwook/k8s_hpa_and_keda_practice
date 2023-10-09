@@ -11,11 +11,13 @@ spec:
   minReplicas: 1
   maxReplicas: 3
   metrics:
-  - type: Pods
-    pods:
+  - type: Object
+    object:
       metric:
         name: nginx_http_requests_total
+      describedObject:
+        kind: Service
+        name: nginx-custom-metric
       target:
         type: Value
-        averageValue: 50
         value: 50
