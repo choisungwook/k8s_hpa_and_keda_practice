@@ -4,7 +4,11 @@
 <br>
 
 # 환경구축
-* kind 클러스터 생성
+* make install로 환경구축 자동화
+* 설치 목록
+  * kind 클러스터 생성
+  * metrics-server
+  * prometheus-adapter
 
 ```bash
 make install
@@ -19,3 +23,5 @@ make install
 make uninstall
 ```
 
+# 참고자료
+* prometheus adapter github: https://github.com/kubernetes-sigs/prometheus-adapter/blob/master/docs/walkthrough.md
