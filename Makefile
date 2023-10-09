@@ -19,4 +19,4 @@ install-prometheus-adapter:
 	@echo "[info] install latest prometheus-adapter"
 	@helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 	@helm repo update
-	@helm install -n ${HELM_NAMESPACE} prometheus-adapter prometheus-community/prometheus-adapter
+	@helm upgrade --install -n ${HELM_NAMESPACE} prometheus-adapter prometheus-community/prometheus-adapter
