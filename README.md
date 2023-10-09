@@ -227,3 +227,4 @@ Events:
 * [blog] nginx metrics: https://velog.io/@sojukang/%EC%84%B8%EC%83%81%EC%97%90%EC%84%9C-%EC%A0%9C%EC%9D%BC-%EC%89%AC%EC%9A%B4-Prometheus-Grafana-%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81-%EC%84%A4%EC%A0%95-NGINX%ED%8E%B8
 * [blog] custom nginx prometheus adatper request_per_second configruation: https://medium.com/ibm-cloud/autoscaling-applications-on-openshift-container-platform-3-11-with-custom-metrics-6e9c14474de3
 * [blog] custom postgres prometheus adatper request_per_second configruation https://www.postgresql.fastware.com/knowledge-base/how-to/installing-the-prometheus-adapter
+* [blog] custom metrics HPA configuration: https://vsoch.github.io/2023/autoscaling-v2/
