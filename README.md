@@ -8,6 +8,7 @@
 * 설치 목록
   * kind 클러스터 생성
   * metrics-server
+  * prometheus-operator
   * prometheus-adapter
 
 ```bash

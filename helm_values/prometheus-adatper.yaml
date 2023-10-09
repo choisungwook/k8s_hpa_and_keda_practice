@@ -1,0 +1,4 @@
+prometheus:
+  url: http://prometheus-operated.default.svc
+  port: 9090
+  path: ""
