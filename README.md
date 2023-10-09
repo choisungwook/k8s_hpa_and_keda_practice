@@ -271,10 +271,11 @@ keda-hpa-nginx-keda-example   Deployment/nginx-keda-example   0/50 (avg)   1    
 ```
 
 ## 6.6 keda 리소스 디버깅
-* keda operator pod 로그 조회
+* keda operator pod 로그 조회: "value: 250"
 
 ```bash
 kubectl -n keda logs -f -l app=keda-operator
+2023-10-09T15:57:02Z	DEBUG	scale_handler	Getting metrics from scaler	{"scaledObject.Namespace": "default", "scaledObject.Name": "nginx-keda-example", "scaler": "prometheusScaler", "metricName": "s0-prometheus", "metrics": [{"metricName":"s0-prometheus","metricLabels":null,"timestamp":"2023-10-09T15:57:02Z","value":"250"}], "scalerError": null}
 ```
 
 # 참고자료
