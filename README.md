@@ -24,6 +24,8 @@ make install
 make uninstall
 ```
 
+<br>
+
 # 4. custom 메트릭 실습
 ## 4.1 custom metrics 조회
 * custom metrics을 조회하면, custom metrics API가 없기 때문에 에러 발생
@@ -94,7 +96,134 @@ $ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1" | jq . | more
 }
 ```
 
+<br>
+
+# 5. custom 메트릭 추가
+## 5.1 nginx pod, service, servicemonitor, hpa 배포
+* 예제 디렉터리에 있는 manifest 배포
+
+```bash
+$ ls ./examples/01_nginx_custom_metrics
+configmap.yaml      deployment.yaml     hpa.yaml            service.yaml        servicemonitor.yaml
+```
+
+```bash
+kubectl apply -f ./examples/01_nginx_custom_metrics/
+```
+
+## 5.2 nginx metric 확인
+* nginx nodeport: http://127.0.0.1:30951
+* nginx metrics nodeport: http://127.0.0.1:30952/metrics
+* http://127.0.0.1:30951를 호출할 때마다 reqeust_count가 1 증가
+
+![](./imgs/nginx_metrics.png)
+
+## 5.3 prometheus에서 nginx 메트릭 확인
+* prometheus nodeport: http://127.0.0.1:30950
+
+![](./imgs/nginx_prometheus_metrics.png)
+
+## 5.4 nginxcustom metrics 설정 추가
+* [proemtheus-adatper 설정](./helm_values/prometheus-adatper.yaml)에서 rules 주석 해제
+* prometheus adatper helm upgrade
+
+```bash
+install-prometheus-adapter
+```
+
+## 5.5 커스텀 메트릭 등록 확인
+* 커스컴 메트릭 목록 확인
+
+```bash
+$ kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1" | jq .
+{
+  "kind": "APIResourceList",
+  "apiVersion": "v1",
+  "groupVersion": "custom.metrics.k8s.io/v1beta1",
+  "resources": [
+    {
+      "name": "jobs.batch/nginx_http_requests_total",
+      "singularName": "",
+      "namespaced": true,
+      "kind": "MetricValueList",
+      "verbs": [
+        "get"
+      ]
+    },
+    {
+      "name": "namespaces/nginx_http_requests_total",
+      "singularName": "",
+      "namespaced": false,
+      "kind": "MetricValueList",
+      "verbs": [
+        "get"
+      ]
+    },
+    {
+      "name": "pods/nginx_http_requests_total",
+      "singularName": "",
+      "namespaced": true,
+      "kind": "MetricValueList",
+      "verbs": [
+        "get"
+      ]
+    },
+    {
+      "name": "services/nginx_http_requests_total",
+      "singularName": "",
+      "namespaced": true,
+      "kind": "MetricValueList",
+      "verbs": [
+        "get"
+      ]
+    },
+  ]
+}
+```
+
+## 5.6 커스텀 메트릭 값 조회
+* nginx_http_requests_total 커스텀 메트릭이 추가되었는지 확인
+
+```bash
+kubectl get --raw "/apis/custom.metrics.k8s.io/v1beta1/namespaces/default/pods/*/nginx_http_requests_total" | jq .
+{
+  "kind": "MetricValueList",
+  "apiVersion": "custom.metrics.k8s.io/v1beta1",
+  "metadata": {},
+  "items": [
+    {
+      "describedObject": {
+        "kind": "Service",
+        "namespace": "default",
+        "name": "nginx-custom-metric",
+        "apiVersion": "/v1"
+      },
+      "metricName": "nginx_http_requests_total",
+      "timestamp": "2023-10-09T13:31:58Z",
+      # metric value
+      "value": "160",
+      "selector": null
+    }
+  ]
+}
+```
+
+## 5.7 HPA 확인
+* 시간이 지나면 nginx probe때문에 request_count자동 증가
+* request_count가 50이상이면 HPA 이벤트 발생
+
+```bash
+$ kubectl -n default get hpa nginx-custom-metric
+Events:
+  Type    Reason             Age   From                       Message
+  ----    ------             ----  ----                       -------
+  Normal  SuccessfulRescale  57s   horizontal-pod-autoscaler  New size: 3; reason: pods metric nginx_http_requests_total above target
+```
+
 # 참고자료
 * [github] prometheus adapter: https://github.com/kubernetes-sigs/prometheus-adapter/blob/master/docs/walkthrough.md
 * [blog] custom and external metrics: https://medium.com/uptime-99/kubernetes-hpa-autoscaling-with-custom-and-external-metrics-da7f41ff7846
 * [blog] rancher prometheus adatper configruation: https://ranchermanager.docs.rancher.com/v2.0-v2.4/explanations/integrations-in-rancher/cluster-monitoring/custom-metrics#querying
+* [blog] nginx metrics: https://velog.io/@sojukang/%EC%84%B8%EC%83%81%EC%97%90%EC%84%9C-%EC%A0%9C%EC%9D%BC-%EC%89%AC%EC%9A%B4-Prometheus-Grafana-%EB%AA%A8%EB%8B%88%ED%84%B0%EB%A7%81-%EC%84%A4%EC%A0%95-NGINX%ED%8E%B8
+* [blog] custom nginx prometheus adatper request_per_second configruation: https://medium.com/ibm-cloud/autoscaling-applications-on-openshift-container-platform-3-11-with-custom-metrics-6e9c14474de3
+* [blog] custom postgres prometheus adatper request_per_second configruation https://www.postgresql.fastware.com/knowledge-base/how-to/installing-the-prometheus-adapter

@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nginx-custom-metric
+  namespace: default
+  labels:
+    app: nginx-custom-metric
+    release: operator
+spec:
+  endpoints:
+  - port: exporter
+  selector:
+    matchLabels:
+      app: nginx-custom-metric

@@ -2,3 +2,17 @@ prometheus:
   url: http://operator-kube-prometheus-s-prometheus.default.svc
   port: 9090
   path: ""
+
+# rules:
+#   custom:
+#   - seriesQuery: '{__name__=~"^nginx_http_requests_total.*",namespace!=""}'
+#     seriesFilters: []
+#     resources:
+#       overrides:
+#         namespace: {resource: "namespace"}
+#         pod: {resource: "pod"}
+#         service: {resource: "service"}
+#     name:
+#       matches: "nginx_http_requests_total"
+#       as: "nginx_http_requests_total"
+#     metricsQuery: 'sum(<<.Series>>{<<.LabelMatchers>>}) by (<<.GroupBy>>)'
