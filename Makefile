@@ -31,4 +31,4 @@ install-keda:
 	@echo "[info] install keda v2.12.0"
 	@helm repo add kedacore https://kedacore.github.io/charts
 	@helm repo update
-	@helm upgrade --install -n keda --create-namespace --version 2.12.0 keda kedacore/keda
+	@helm upgrade --install -n keda --create-namespace -f helm_values/keda-operator.yaml --version 2.12.0 keda kedacore/keda
