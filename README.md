@@ -278,6 +278,14 @@ kubectl -n keda logs -f -l app=keda-operator
 2023-10-09T15:57:02Z	DEBUG	scale_handler	Getting metrics from scaler	{"scaledObject.Namespace": "default", "scaledObject.Name": "nginx-keda-example", "scaler": "prometheusScaler", "metricName": "s0-prometheus", "metrics": [{"metricName":"s0-prometheus","metricLabels":null,"timestamp":"2023-10-09T15:57:02Z","value":"250"}], "scalerError": null}
 ```
 
+* hpa avg 확인
+
+```bash
+kubectl -n default get hpa
+NAME                          REFERENCE                       TARGETS           MINPODS   MAXPODS   REPLICAS   AGE
+keda-hpa-nginx-keda-example   Deployment/nginx-keda-example   60200m/50 (avg)   1         5         5          29m
+```
+
 # 참고자료
 * [github] prometheus adapter: https://github.com/kubernetes-sigs/prometheus-adapter/blob/master/docs/walkthrough.md
 * [blog] custom and external metrics: https://medium.com/uptime-99/kubernetes-hpa-autoscaling-with-custom-and-external-metrics-da7f41ff7846
