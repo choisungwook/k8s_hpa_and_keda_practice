@@ -16,6 +16,6 @@ spec:
   - type: prometheus
     metadata:
       serverAddress: http://operator-kube-prometheus-s-prometheus.default.svc:9090
-      metricName: 'nginx_http_requests_total'
+      metricName: 'nginx_http_requests'
       threshold: '50'
-      query: sum(http_requests_total)
+      query: sum(nginx_http_requests_total{pod=~"nginx-.*"})
