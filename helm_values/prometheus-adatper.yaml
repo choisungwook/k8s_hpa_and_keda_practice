@@ -1,4 +1,4 @@
 prometheus:
-  url: http://prometheus-operated.default.svc
+  url: http://operator-kube-prometheus-s-prometheus.default.svc
   port: 9090
   path: ""
